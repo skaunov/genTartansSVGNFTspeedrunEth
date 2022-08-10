@@ -107,10 +107,12 @@ contract YourCollectible is ERC721, Ownable {
         tartan[i].color = bytes3(bytes.concat(seed_the[i+0], seed_the[i+1], seed_the[i+2]));
       // }
     }
+    uint40 seed_sizes = uint40(bytes5(bytes.concat(seed_the[27], seed_the[28], seed_the[29], seed_the[30], seed_the[31])));
     // TODO limit sizes to 10-70, and add central pivot
     for (uint i = 0; i < tartan.length; i++) {
-      tartan[i].size = 20;
+      tartan[i].size = uint8((1 + seed_sizes % 7) * 10);
       tileSize += tartan[i].size;
+      seed_sizes = seed_sizes >> 1;
     }
     console.log("`tileSize` is:", tileSize);
 
