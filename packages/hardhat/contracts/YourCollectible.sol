@@ -17,6 +17,7 @@ import './ToColor.sol';
 // GET LISTED ON OPENSEA: https://testnets.opensea.io/get-listed/step-two
 
 contract YourCollectible is ERC721, Ownable {
+  string constant SVG_DEFS = '<defs><pattern id="pattern" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse"><polygon points="0,4 0,8 8,0 4,0" fill="#ffffff"></polygon><polygon points="4,8 8,8 8,4" fill="#ffffff"></polygon></pattern><mask id="grating" x="0" y="0" width="1" height="1"><rect x="0" y="0" width="100%" height="100%" fill="url(#pattern)"></rect></mask></defs>';
 
   struct TartanStripe {
     bytes3 color;
@@ -41,6 +42,7 @@ contract YourCollectible is ERC721, Ownable {
 
   uint256 mintDeadline = block.timestamp + 24 hours;
 
+  // TODO change the names!
   constructor() public ERC721("Loogies", "LOOG") {
     // RELEASE THE LOOGIES!
   }
@@ -98,7 +100,7 @@ contract YourCollectible is ERC721, Ownable {
           );
   }
 
-  function generateSVGofTokenById(uint256 id) /* internal */ public view returns (string memory) {
+  function getTartan_array(uint id) internal view returns (TartanStripe[9] memory, uint) {
     bytes32 seed_the = seed[id];
     TartanStripe[9] memory tartan;
     uint tileSize;
@@ -115,9 +117,23 @@ contract YourCollectible is ERC721, Ownable {
       seed_sizes = seed_sizes >> 1;
     }
     console.log("`tileSize` is:", tileSize);
+    return (tartan, tileSize);
+  }
+  
+  function generateSVGofTokenById(uint256 id) /* internal */ public view returns (string memory) {
+    (/* TartanStripe[9] memory tartan */, uint tileSize) = getTartan_array(id);
+    string memory svg = string(abi.encodePacked(
+      '<svg viewBox="0 0 ', tileSize.toString(), ' ', tileSize.toString(),'" width="', tileSize.toString(), '" height="', tileSize.toString(), '" x="0" y="0" xmlns="http://www.w3.org/2000/svg">',
+        renderTokenById(id),
+      '</svg>'
+    ));
 
-    string memory svgDefs = '<defs><pattern id="pattern" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse"><polygon points="0,4 0,8 8,0 4,0" fill="#ffffff"></polygon><polygon points="4,8 8,8 8,4" fill="#ffffff"></polygon></pattern><mask id="grating" x="0" y="0" width="1" height="1"><rect x="0" y="0" width="100%" height="100%" fill="url(#pattern)"></rect></mask></defs>';
+    return svg;
+  }
 
+  // Visibility is `public` to enable it being called by other contracts for composition.
+  function renderTokenById(uint256 id) public view returns (string memory) {
+    (TartanStripe[9] memory tartan, /* uint tileSize */) = getTartan_array(id);
     string memory horizontalStrings; 
     string memory verticalStrings;
     uint accumulatedSize;
@@ -135,41 +151,14 @@ contract YourCollectible is ERC721, Ownable {
     }
     // console.log('hor & vert after cycle', horizontalStrings, verticalStrings);
 
-    string memory svg = string(abi.encodePacked(
-      '<svg viewBox="0 0 ', tileSize.toString(), ' ', tileSize.toString(),'" width="', tileSize.toString(), '" height="', tileSize.toString(), '" x="0" y="0" xmlns="http://www.w3.org/2000/svg">',
-        svgDefs,
-        '<g id="horizontalStripes">',
-          horizontalStrings,
-        '</g>',
-        '<g id="verticalStripes" mask="url(#grating)">',
-          verticalStrings,
-        '</g>',
-      '</svg>'
-    ));
-
-    // console.log('result `svg`', svg);
-
-    return svg;
-  }
-
-  // Visibility is `public` to enable it being called by other contracts for composition.
-  function renderTokenById(uint256 id) public view returns (string memory) {
     string memory render = string(abi.encodePacked(
-      '<g id="eye1">',
-          '<ellipse stroke-width="3" ry="29.5" rx="29.5" id="svg_1" cy="154.5" cx="181.5" stroke="#000" fill="#fff"/>',
-          '<ellipse ry="3.5" rx="2.5" id="svg_3" cy="154.5" cx="173.5" stroke-width="3" stroke="#000" fill="#000000"/>',
-        '</g>',
-        '<g id="head">',
-          '<ellipse fill="#',
-          color[id].toColor(),
-          '" stroke-width="3" cx="204.5" cy="211.80065" id="svg_5" rx="',
-          chubbiness[id].toString(),
-          '" ry="51.80065" stroke="#000"/>',
-        '</g>',
-        '<g id="eye2">',
-          '<ellipse stroke-width="3" ry="29.5" rx="29.5" id="svg_2" cy="168.5" cx="209.5" stroke="#000" fill="#fff"/>',
-          '<ellipse ry="3.5" rx="3" id="svg_4" cy="169.5" cx="208" stroke-width="3" fill="#000000" stroke="#000"/>',
-        '</g>'
+      SVG_DEFS,
+      '<g id="horizontalStripes">',
+        horizontalStrings,
+      '</g>',
+      '<g id="verticalStripes" mask="url(#grating)">',
+        verticalStrings,
+      '</g>'
       ));
 
     return render;
