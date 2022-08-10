@@ -43,13 +43,18 @@ module.exports = {
   // (you will need to restart the `yarn run start` dev server after editing the .env)
 
   networks: {
-    localhost: {
-      url: "http://localhost:8545",
+    hardhat: {
+      // url: "http://localhost:8545",
       //gasPrice: 125000000000,//you can adjust gasPrice locally to see how much it will cost on production
       /*
         notice no mnemonic here? it will just use account 0 of the hardhat node to deploy
         (you can put in a mnemonic here to set the deployer locally)
       */
+      mining: {
+        // interval: [5000, 10000],
+        mempool: {order: "fifo"}
+      },
+      // chainId: "31337"
     },
     rinkeby: {
       url: "https://rinkeby.infura.io/v3/460f40a260564ac4a4f4b3fffb032dad", //<---- YOUR INFURA ID! (or it won't work)
@@ -99,6 +104,16 @@ module.exports = {
   },
   solidity: {
     compilers: [
+      {
+        version: "0.8.16",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200
+          },
+          viaIR: true
+        }
+      },
       {
         version: "0.7.6",
         settings: {

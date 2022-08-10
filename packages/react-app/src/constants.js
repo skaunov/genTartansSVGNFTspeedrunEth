@@ -302,7 +302,8 @@ export const NETWORKS = {
     color: "#666666",
     chainId: 31337,
     blockExplorer: "",
-    rpcUrl: "http://" + window.location.hostname + ":8545",
+    // rpcUrl: "http://" + window.location.hostname + ":8545",
+    rpcUrl: "http://localhost:8545",
   },
   mainnet: {
     name: "mainnet",

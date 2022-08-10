@@ -1,3 +1,6 @@
+// pragma solidity ^0.6.6;
+pragma solidity ^0.8.0;
+
 library ToColor {
     bytes16 internal constant ALPHABET = '0123456789abcdef';
 

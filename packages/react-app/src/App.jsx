@@ -432,7 +432,8 @@ function App(props) {
             <div style={{ maxWidth: 820, margin: "auto", marginTop: 32, paddingBottom: 32 }}>
               {isSigner?(
                 <Button type={"primary"} onClick={()=>{
-                  tx( writeContracts.YourCollectible.mintItem() )
+                  // TODO set reasonable `gasLimit` for prod!!
+                  tx( writeContracts.YourCollectible.mintItem({gasLimit: 9500000}) )
                 }}>MINT</Button>
               ):(
                 <Button type={"primary"} onClick={loadWeb3Modal}>CONNECT WALLET</Button>
