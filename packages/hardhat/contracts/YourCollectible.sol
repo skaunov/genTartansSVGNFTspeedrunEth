@@ -65,14 +65,26 @@ contract YourCollectible is ERC721Enumerable, Ownable {
 
   function tokenURI(uint256 id) public view override returns (string memory) {
       require(_exists(id), "not exist");
+      
       string memory name = string(abi.encodePacked('genTartan #',id.toString()));
+
       (TartanStripe[9] memory tartan, uint tileSize) = getTartan_array(id);
+      string memory colors_str = string.concat(' ', tartan[0].color.toColor());
+      string memory colors_str_json = string.concat('"', tartan[0].color.toColor(), '"');
+      // TODO: solve colors duplication gracefully; it's not good to see duplicates in the descr, but there should be way to find out the sequence programmatically
+      // TODO: would be nice to microformat colors or find names for them, or smtg like that
+      for (uint i = 1; i < tartan.length; i++) {
+        colors_str = string.concat(colors_str, ' ', tartan[i].color.toColor(), ' ');
+        colors_str_json = string.concat(colors_str_json, ', "', tartan[i].color.toColor(), '"');
+      }
+      // colors_str = string.concat('[',colors_str, ']');
+      colors_str_json = string.concat('[', colors_str_json, ']');
       string memory description = string(abi.encodePacked(
-        'The Tartan of colors #',
-        /* color[id].toColor(), */
-        ' with a chubbiness of ',
-        /* uint2str(chubbiness[id]), */
-        '!!!'
+        'The Tartan of colors:',
+        colors_str,
+        ' with size of ',
+        tileSize.toString(),
+        '.'
       ));
       string memory image = Base64.encode(bytes(generateSVGofTokenById(id)));
 
@@ -88,12 +100,12 @@ contract YourCollectible is ERC721Enumerable, Ownable {
                               name,
                               '", "description":"',
                               description,
-                              '", "external_url":"TODO"',//"https://burnyboys.com/token/', "https://ohpandas.com/token/'
-                              id.toString(),
-                              '", "attributes": [{"trait_type": "color", "value": "#',
-                              // color[id].toColor(),
-                              '"},{"trait_type": "chubbiness", "value": "TODO"',
-                              // uint2str(chubbiness[id]),
+                              '", "external_url":"TODO',//"https://burnyboys.com/token/', "https://ohpandas.com/token/'
+                              // id.toString(),
+                              '", "attributes": [{"trait_type": "colors", "value": ',
+                              colors_str_json,
+                              '},{"trait_type": "tileSize", "value": ',
+                              tileSize.toString(),
                               '}], "owner":"',
                               (uint160(ownerOf(id))).toHexString(20),
                               '", "image": "',
@@ -148,7 +160,7 @@ contract YourCollectible is ERC721Enumerable, Ownable {
       string memory rectString; 
       string memory horizontalString;
       string memory verticalString;
-      rectString = string.concat('<rect fill="#', tartan[i].color.toColor(), '" ');
+      rectString = string.concat('<rect fill="', tartan[i].color.toColor(), '" ');
       horizontalString = string.concat(rectString, 'width="100%" height="', tartan[i].size.toString(), '" x="0" y="', accumulatedSize.toString(), '" />');
       verticalString   = string.concat(rectString, 'width="', tartan[i].size.toString(), '" height="100%" x="', accumulatedSize.toString(), '" y="0" />');
       accumulatedSize += tartan[i].size;

@@ -10,6 +10,6 @@ library ToColor {
           buffer[i*2+1] = ALPHABET[uint8(value[i]) & 0xf];
           buffer[i*2] = ALPHABET[uint8(value[i]>>4) & 0xf];
       }
-      return string(buffer);
+      return string.concat('#', string(buffer));
     }
 }

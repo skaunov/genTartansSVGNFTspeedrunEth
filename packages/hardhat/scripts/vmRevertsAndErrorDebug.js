@@ -22,6 +22,9 @@ ethers.getContractFactory("YourCollectible")
                     // contract.ownerOf("1")
                     //     .then(result => console.log(result));
                 })
+                .then(receipt => {
+                    contract.tokenURI("1").then(result => console.log(result))
+                })
             )
         )
     )
