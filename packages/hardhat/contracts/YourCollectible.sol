@@ -44,8 +44,7 @@ contract YourCollectible is ERC721Enumerable, Ownable {
   // TODO do I need this deadline?
   uint256 mintDeadline = block.timestamp + 24 hours;
 
-  // TODO change the names!
-  constructor() public ERC721("Loogies", "LOOG") {}
+  constructor() public ERC721("Random Generative Tartans", "RGTN") {}
 
   function mintItem()
       public
@@ -66,9 +65,10 @@ contract YourCollectible is ERC721Enumerable, Ownable {
 
   function tokenURI(uint256 id) public view override returns (string memory) {
       require(_exists(id), "not exist");
-      string memory name = string(abi.encodePacked('Loogie #',id.toString()));
+      string memory name = string(abi.encodePacked('genTartan #',id.toString()));
+      (TartanStripe[9] memory tartan, uint tileSize) = getTartan_array(id);
       string memory description = string(abi.encodePacked(
-        'This Loogie is the color #',
+        'The Tartan of colors #',
         /* color[id].toColor(), */
         ' with a chubbiness of ',
         /* uint2str(chubbiness[id]), */
@@ -88,7 +88,7 @@ contract YourCollectible is ERC721Enumerable, Ownable {
                               name,
                               '", "description":"',
                               description,
-                              '", "external_url":"https://burnyboys.com/token/',
+                              '", "external_url":"TODO"',//"https://burnyboys.com/token/', "https://ohpandas.com/token/'
                               id.toString(),
                               '", "attributes": [{"trait_type": "color", "value": "#',
                               // color[id].toColor(),
