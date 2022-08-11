@@ -2,7 +2,8 @@
 // pragma solidity >=0.6.0 <0.7.0;
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+// import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
@@ -16,7 +17,7 @@ import './ToColor.sol';
 
 // GET LISTED ON OPENSEA: https://testnets.opensea.io/get-listed/step-two
 
-contract YourCollectible is ERC721, Ownable {
+contract YourCollectible is ERC721Enumerable, Ownable {
   string constant SVG_DEFS = '<defs><pattern id="pattern" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse"><polygon points="0,4 0,8 8,0 4,0" fill="#ffffff"></polygon><polygon points="4,8 8,8 8,4" fill="#ffffff"></polygon></pattern><mask id="grating" x="0" y="0" width="1" height="1"><rect x="0" y="0" width="100%" height="100%" fill="url(#pattern)"></rect></mask></defs>';
 
   struct TartanStripe {
@@ -36,16 +37,15 @@ contract YourCollectible is ERC721, Ownable {
   using Counters for Counters.Counter;
   Counters.Counter private _tokenIds;
 
-  mapping (uint256 => bytes3) public color;
-  mapping (uint256 => uint256) public chubbiness;
+  // mapping (uint256 => bytes3) public color;
+  // mapping (uint256 => uint256) public chubbiness;
   mapping (uint256 => bytes32) seed;
 
+  // TODO do I need this deadline?
   uint256 mintDeadline = block.timestamp + 24 hours;
 
   // TODO change the names!
-  constructor() public ERC721("Loogies", "LOOG") {
-    // RELEASE THE LOOGIES!
-  }
+  constructor() public ERC721("Loogies", "LOOG") {}
 
   function mintItem()
       public
@@ -67,7 +67,13 @@ contract YourCollectible is ERC721, Ownable {
   function tokenURI(uint256 id) public view override returns (string memory) {
       require(_exists(id), "not exist");
       string memory name = string(abi.encodePacked('Loogie #',id.toString()));
-      string memory description = string(abi.encodePacked('This Loogie is the color #',color[id].toColor(),' with a chubbiness of ',uint2str(chubbiness[id]),'!!!'));
+      string memory description = string(abi.encodePacked(
+        'This Loogie is the color #',
+        /* color[id].toColor(), */
+        ' with a chubbiness of ',
+        /* uint2str(chubbiness[id]), */
+        '!!!'
+      ));
       string memory image = Base64.encode(bytes(generateSVGofTokenById(id)));
 
       return
@@ -77,6 +83,7 @@ contract YourCollectible is ERC721, Ownable {
                 Base64.encode(
                     bytes(
                           abi.encodePacked(
+                            // TODO describe tartan
                               '{"name":"',
                               name,
                               '", "description":"',
@@ -84,9 +91,9 @@ contract YourCollectible is ERC721, Ownable {
                               '", "external_url":"https://burnyboys.com/token/',
                               id.toString(),
                               '", "attributes": [{"trait_type": "color", "value": "#',
-                              color[id].toColor(),
-                              '"},{"trait_type": "chubbiness", "value": ',
-                              uint2str(chubbiness[id]),
+                              // color[id].toColor(),
+                              '"},{"trait_type": "chubbiness", "value": "TODO"',
+                              // uint2str(chubbiness[id]),
                               '}], "owner":"',
                               (uint160(ownerOf(id))).toHexString(20),
                               '", "image": "',
@@ -164,25 +171,26 @@ contract YourCollectible is ERC721, Ownable {
     return render;
   }
 
-  function uint2str(uint _i) internal pure returns (string memory _uintAsString) {
-      if (_i == 0) {
-          return "0";
-      }
-      uint j = _i;
-      uint len;
-      while (j != 0) {
-          len++;
-          j /= 10;
-      }
-      bytes memory bstr = new bytes(len);
-      uint k = len;
-      while (_i != 0) {
-          k = k-1;
-          uint8 temp = (48 + uint8(_i - _i / 10 * 10));
-          bytes1 b1 = bytes1(temp);
-          bstr[k] = b1;
-          _i /= 10;
-      }
-      return string(bstr);
-  }
+  // TODO delete the function: it looks like an alternative for `toString()` lib method
+  // function uint2str(uint _i) internal pure returns (string memory _uintAsString) {
+  //     if (_i == 0) {
+  //         return "0";
+  //     }
+  //     uint j = _i;
+  //     uint len;
+  //     while (j != 0) {
+  //         len++;
+  //         j /= 10;
+  //     }
+  //     bytes memory bstr = new bytes(len);
+  //     uint k = len;
+  //     while (_i != 0) {
+  //         k = k-1;
+  //         uint8 temp = (48 + uint8(_i - _i / 10 * 10));
+  //         bytes1 b1 = bytes1(temp);
+  //         bstr[k] = b1;
+  //         _i /= 10;
+  //     }
+  //     return string(bstr);
+  // }
 }

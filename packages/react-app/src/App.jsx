@@ -110,6 +110,7 @@ const web3Modal = new Web3Modal({
       package: WalletConnectProvider, // required
       options: {
         infuraId: INFURA_ID,
+        rpc: {31337: "http://localhost:8545"}
       },
     },
   },
@@ -195,7 +196,7 @@ function App(props) {
   useEffect(() => {
     const updateYourCollectibles = async () => {
       const collectibleUpdate = [];
-      for (let tokenIndex = 0; tokenIndex < balance; tokenIndex++) {
+      for (let tokenIndex = 0; tokenIndex < balance.toNumber(); tokenIndex++) {
         try {
           console.log("GEtting token index", tokenIndex);
           const tokenId = await readContracts.YourCollectible.tokenOfOwnerByIndex(address, tokenIndex);
@@ -432,8 +433,8 @@ function App(props) {
             <div style={{ maxWidth: 820, margin: "auto", marginTop: 32, paddingBottom: 32 }}>
               {isSigner?(
                 <Button type={"primary"} onClick={()=>{
-                  // TODO set reasonable `gasLimit` for prod!!
-                  tx( writeContracts.YourCollectible.mintItem({gasLimit: 9500000}) )
+                  // TODO set reasonable `gasLimit` for prod!! {gasLimit: 9500000}
+                  tx( writeContracts.YourCollectible.mintItem() )
                 }}>MINT</Button>
               ):(
                 <Button type={"primary"} onClick={loadWeb3Modal}>CONNECT WALLET</Button>
