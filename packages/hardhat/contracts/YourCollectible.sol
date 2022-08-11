@@ -37,12 +37,9 @@ contract YourCollectible is ERC721Enumerable, Ownable {
   using Counters for Counters.Counter;
   Counters.Counter private _tokenIds;
 
-  // mapping (uint256 => bytes3) public color;
-  // mapping (uint256 => uint256) public chubbiness;
   mapping (uint256 => bytes32) seed;
 
-  // TODO do I need this deadline?
-  uint256 mintDeadline = block.timestamp + 24 hours;
+  // uint256 mintDeadline = block.timestamp + 24 hours;
 
   constructor() public ERC721("Random Generative Tartans", "RGTN") {}
 
@@ -50,7 +47,7 @@ contract YourCollectible is ERC721Enumerable, Ownable {
       public
       returns (uint256)
   {
-      require( block.timestamp < mintDeadline, "DONE MINTING");
+      // require( block.timestamp < mintDeadline, "DONE MINTING");
       _tokenIds.increment();
 
       uint256 id = _tokenIds.current();
@@ -71,8 +68,6 @@ contract YourCollectible is ERC721Enumerable, Ownable {
       (TartanStripe[9] memory tartan, uint tileSize) = getTartan_array(id);
       string memory colors_str = string.concat(' ', tartan[0].color.toColor());
       string memory colors_str_json = string.concat('"', tartan[0].color.toColor(), '"');
-      // TODO: solve colors duplication gracefully; it's not good to see duplicates in the descr, but there should be way to find out the sequence programmatically
-      // TODO: would be nice to microformat colors or find names for them, or smtg like that
       for (uint i = 1; i < tartan.length; i++) {
         colors_str = string.concat(colors_str, ' ', tartan[i].color.toColor(), ' ');
         colors_str_json = string.concat(colors_str_json, ', "', tartan[i].color.toColor(), '"');
@@ -95,7 +90,6 @@ contract YourCollectible is ERC721Enumerable, Ownable {
                 Base64.encode(
                     bytes(
                           abi.encodePacked(
-                            // TODO describe tartan
                               '{"name":"',
                               name,
                               '", "description":"',
@@ -129,7 +123,7 @@ contract YourCollectible is ERC721Enumerable, Ownable {
       // }
     }
     uint40 seed_sizes = uint40(bytes5(bytes.concat(seed_the[27], seed_the[28], seed_the[29], seed_the[30], seed_the[31])));
-    // TODO limit sizes to 10-70, and add central pivot
+    // TODO ~~limit sizes to 10-70,~~ and add central pivot
     for (uint i = 0; i < tartan.length; i++) {
       tartan[i].size = uint8((1 + seed_sizes % 7) * 10);
       tileSize += tartan[i].size;
@@ -182,27 +176,4 @@ contract YourCollectible is ERC721Enumerable, Ownable {
 
     return render;
   }
-
-  // TODO delete the function: it looks like an alternative for `toString()` lib method
-  // function uint2str(uint _i) internal pure returns (string memory _uintAsString) {
-  //     if (_i == 0) {
-  //         return "0";
-  //     }
-  //     uint j = _i;
-  //     uint len;
-  //     while (j != 0) {
-  //         len++;
-  //         j /= 10;
-  //     }
-  //     bytes memory bstr = new bytes(len);
-  //     uint k = len;
-  //     while (_i != 0) {
-  //         k = k-1;
-  //         uint8 temp = (48 + uint8(_i - _i / 10 * 10));
-  //         bytes1 b1 = bytes1(temp);
-  //         bstr[k] = b1;
-  //         _i /= 10;
-  //     }
-  //     return string(bstr);
-  // }
 }

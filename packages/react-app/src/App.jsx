@@ -407,7 +407,7 @@ function App(props) {
               }}
               to="/"
             >
-              Your Loogies
+              Your genTartans
             </Link>
           </Menu.Item>
           <Menu.Item key="/debug">
@@ -433,7 +433,6 @@ function App(props) {
             <div style={{ maxWidth: 820, margin: "auto", marginTop: 32, paddingBottom: 32 }}>
               {isSigner?(
                 <Button type={"primary"} onClick={()=>{
-                  // TODO set reasonable `gasLimit` for prod!! {gasLimit: 9500000}
                   tx( writeContracts.YourCollectible.mintItem() )
                 }}>MINT</Button>
               ):(
